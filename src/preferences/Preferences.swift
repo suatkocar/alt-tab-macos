@@ -28,6 +28,17 @@ class Preferences {
             "appearanceTheme": AppearanceThemePreference.system.indexAsString,
             "showOnScreen": ShowOnScreenPreference.active.indexAsString,
             "titleTruncation": TitleTruncationPreference.end.indexAsString,
+            "switcherBackgroundOpacity": "0",
+            "cardOpacity": "100",
+            "cardCornerRadius": "20",
+            "cardPaddingTenths": "60",
+            "titleFontSize": "16",
+            "titleFontWeight": TitleFontWeightPreference.medium.indexAsString,
+            "thumbnailIconSize": "28",
+            "thumbnailHalfRows": "6",
+            "switcherMaxWidthAuto": "true",
+            "switcherMaxWidth": "90",
+            "switcherMaxHeight": "80",
             "showTitles": ShowTitlesPreference.windowTitle.indexAsString,
             "fadeOutAnimation": "false",
             "previewFadeInAnimation": "true",
@@ -107,6 +118,19 @@ class Preferences {
     static var cursorFollowFocus: CursorFollowFocus { CachedUserDefaults.macroPref("cursorFollowFocus", CursorFollowFocus.allCases) }
     static var trackpadHapticFeedbackEnabled: Bool { CachedUserDefaults.bool("trackpadHapticFeedbackEnabled") }
     static var hideColoredCircles: Bool { CachedUserDefaults.bool("hideColoredCircles") }
+    // Fine-tune sheet. Sizes apply to the Thumbnails style when the active shortcut doesn't override its size.
+    static var switcherBackgroundOpacity: Int { CachedUserDefaults.int("switcherBackgroundOpacity") }
+    static var cardOpacity: Int { CachedUserDefaults.int("cardOpacity") }
+    static var cardCornerRadius: Int { CachedUserDefaults.int("cardCornerRadius") }
+    /// Stored in tenths of a point: the slider steps by 0.1pt, and stock sliders only store integers.
+    static var cardPadding: CGFloat { CGFloat(CachedUserDefaults.int("cardPaddingTenths")) / 10 }
+    static var titleFontSize: Int { CachedUserDefaults.int("titleFontSize") }
+    static var titleFontWeight: TitleFontWeightPreference { CachedUserDefaults.macroPref("titleFontWeight", TitleFontWeightPreference.allCases) }
+    static var thumbnailIconSize: Int { CachedUserDefaults.int("thumbnailIconSize") }
+    static var thumbnailHalfRows: Int { CachedUserDefaults.int("thumbnailHalfRows") }
+    static var switcherMaxWidthAuto: Bool { CachedUserDefaults.bool("switcherMaxWidthAuto") }
+    static var switcherMaxWidth: Int { CachedUserDefaults.int("switcherMaxWidth") }
+    static var switcherMaxHeight: Int { CachedUserDefaults.int("switcherMaxHeight") }
     static var windowDisplayDelayInMs: Int { CachedUserDefaults.int("windowDisplayDelay") }
     static var windowDisplayDelay: DispatchTimeInterval { DispatchTimeInterval.milliseconds(windowDisplayDelayInMs) }
     static var fadeOutAnimation: Bool { CachedUserDefaults.bool("fadeOutAnimation") }

@@ -13,6 +13,7 @@ class TileView: FlippedView {
     var statusIcons = StatusIconsView()
     var dockLabelIcon = TileFontIconView(badgeSize: TileFontIconView.badgeBaseSize(forIconSize: TileView.iconSize().width))
     var windowlessAppIndicator = WindowlessAppIndicator(tooltip: TileView.noOpenWindowToolTip)
+    var card = makeCard()
     private var fullTitle = ""
     private var fullTitleWidth = CGFloat(0)
     private struct TruncationKey: Hashable {
@@ -51,6 +52,16 @@ class TileView: FlippedView {
     // periphery:ignore - AppKit private overrides, found by the ObjC runtime rather than called
     @objc func _layoutSubtreeWithOldSize(_ oldSize: NSSize) {}
 
+    /// With AppKit's layout pass stopped here, `card` is laid out only when asked (`layoutCard`), and its glass
+    /// builds its layers only when that happens inside a window. Measured: laid out before the tile joined the
+    /// window, it drew nothing on every later summon until laid out again here.
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        guard window != nil else { return }
+        card.needsLayout = true
+        card.layoutSubtreeIfNeeded()
+    }
+
     override func isAccessibilityElement() -> Bool { true }
 
     func mouseMoved() {
@@ -69,13 +80,15 @@ class TileView: FlippedView {
     }
 
     /// The frame used by TileUnderLayer to position the highlight rectangle.
-    /// In appIcons style, it covers appIcon + edge insets. Otherwise, it covers the full cell.
+    /// In appIcons style, it covers appIcon + edge insets. Otherwise, a ring just outside the card: the tile is as
+    /// tall as its row, so a shorter card would otherwise sit in a highlight with empty space under it.
     var highlightFrame: CGRect {
         if Preferences.effectiveAppearanceStyle(SwitcherSession.activeShortcutIndex) == .appIcons {
             return CGRect(x: 0, y: 0,
                           width: frame.width, height: appIcon.frame.height + Appearance.edgeInsetsSize * 2)
         }
-        return CGRect(origin: .zero, size: frame.size)
+        let ring = AppearanceTestable.cardRingMargin
+        return card.frame.insetBy(dx: -ring, dy: -ring)
     }
 
     func updateRecycledCellWithNewContent(_ element: Window, _ index: Int, _ newHeight: CGFloat) {
@@ -125,6 +138,11 @@ class TileView: FlippedView {
     }
 
     private func setupSharedSubviews() {
+        addSubview(card)
+        // Reassigning `subviews` (addSubviews) re-stacks every subview layer above the app icon and thumbnail
+        // layers added below, whatever the subview order (measured: the card ended up above the icon). A
+        // negative zPosition keeps it behind them.
+        card.layer!.zPosition = -1
         thumbnail.masksToBounds = false // let thumbnail shadows show
         appIconHighlight.isHidden = true
         layer!.addSublayer(appIconHighlight)
@@ -150,6 +168,7 @@ class TileView: FlippedView {
         TileView.disableImplicitLayerAnimations(on: statusIcons)
         TileView.disableImplicitLayerAnimations(on: windowlessAppIndicator)
         TileView.disableImplicitLayerAnimations(on: dockLabelIcon)
+        TileView.disableImplicitLayerAnimations(on: card)
         applyShadows()
     }
 
@@ -173,6 +192,24 @@ class TileView: FlippedView {
         thumbnail.applyShadow(TileView.makeThumbnailShadow(Appearance.imagesShadowColor))
         appIcon.applyShadow(TileView.makeAppIconShadow(Appearance.imagesShadowColor))
         dockLabelIcon.shadow = TileView.makeShadow(Appearance.imagesShadowColor)
+        // `applyLabelHalo` puts it back when no card sits behind the title, in the new colour
+        label.shadow = nil
+        statusIcons.shadow = TileView.makeTextHaloShadow(Appearance.textHaloColor)
+        windowlessAppIndicator.shadow = TileView.makeTextHaloShadow(Appearance.textHaloColor)
+        styleCard(card)
+        applyThumbnailCorners()
+    }
+
+    /// Concentric with the card's corners across its padding. Clipping hides the thumbnail's shadow, which the
+    /// card makes unnecessary; without rounded corners the thumbnail stays unclipped and keeps it.
+    private func applyThumbnailCorners() {
+        let inner = AppearanceTestable.cardInnerRadius(cardRadius: CGFloat(Preferences.cardCornerRadius), padding: TileView.cardPadding)
+        thumbnail.cornerRadius = inner
+        thumbnail.masksToBounds = inner > 0
+    }
+
+    private static var cardPadding: CGFloat {
+        AppearanceTestable.effectiveCardPadding(Preferences.cardPadding, edgeInsets: Appearance.edgeInsetsSize)
     }
 
     /// dockLabelIcon's badge metrics are baked into `let`s sized from the app-icon size, so it can't
@@ -218,6 +255,15 @@ class TileView: FlippedView {
         statusIcons.isHidden = style == .appIcons
         label.alignment = style == .appIcons ? .center : .natural
         label.isHidden = style == .appIcons
+        card.isHidden = style == .appIcons || Preferences.cardOpacity == 0
+        applyLabelHalo()
+    }
+
+    /// Without a card behind it (the App Icons style, or the card faded to 0%) the title needs its halo.
+    private func applyLabelHalo() {
+        let wantsHalo = card.isHidden
+        guard wantsHalo != (label.shadow != nil) else { return }
+        label.shadow = wantsHalo ? TileView.makeTextHaloShadow(Appearance.textHaloColor) : nil
     }
 
     private func updateAppIconsLabel(isFocused: Bool, isHovered: Bool) {
@@ -581,8 +627,26 @@ class TileView: FlippedView {
             assignIfDifferent(&thumbnail.frame.origin, NSPoint(x: edgeInsets, y: edgeInsets + hHeight + Appearance.intraCellPadding))
             thumbnail.centerInSuperlayer(x: true)
         }
+        if Preferences.effectiveAppearanceStyle(SwitcherSession.activeShortcutIndex) != .appIcons {
+            updateCardFrame(max(appIcon.frame.height, TilesView.layoutCache.labelHeight))
+        }
         updateWindowlessAppIndicatorPosition()
         updateDockLabelIconPosition()
+    }
+
+    /// The card hugs the title row and the thumbnail, so a shorter thumbnail makes a shorter card.
+    private func updateCardFrame(_ rowHeight: CGFloat) {
+        let contentBottom = thumbnail.isHidden ? Appearance.edgeInsetsSize + rowHeight : thumbnail.frame.maxY
+        let cardFrame = AppearanceTestable.cardFrame(tileWidth: frame.width, edgeInsets: Appearance.edgeInsetsSize,
+                                                     contentBottom: contentBottom, padding: Preferences.cardPadding)
+        layoutCard(card, cardFrame)
+    }
+
+    /// Concentric with the card, like the ring `highlightFrame` draws around it.
+    var highlightCornerRadius: CGFloat {
+        guard Preferences.effectiveAppearanceStyle(SwitcherSession.activeShortcutIndex) != .appIcons else { return Appearance.cellCornerRadius }
+        let radius = CGFloat(Preferences.cardCornerRadius)
+        return radius > 0 ? radius + AppearanceTestable.cardRingMargin : 0
     }
 
     private func updateDockLabelIconPosition() {
@@ -665,6 +729,17 @@ class TileView: FlippedView {
         shadow.shadowColor = color
         shadow.shadowOffset = .zero
         shadow.shadowBlurRadius = 1
+        return shadow
+    }
+
+    /// The panel draws no background, so text and glyphs in `fontColor` sit on whatever is behind the
+    /// switcher, including content of that same colour. A halo in the opposite colour keeps them legible.
+    static func makeTextHaloShadow(_ color: NSColor?) -> NSShadow? {
+        guard let color else { return nil }
+        let shadow = NSShadow()
+        shadow.shadowColor = color
+        shadow.shadowOffset = .zero
+        shadow.shadowBlurRadius = 3
         return shadow
     }
 

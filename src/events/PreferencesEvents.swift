@@ -12,6 +12,17 @@ class PreferencesEvents {
         "appearanceSize",
         "appearanceTheme",
         "showOnScreen",
+        "switcherBackgroundOpacity",
+        "cardOpacity",
+        "cardCornerRadius",
+        "cardPaddingTenths",
+        "titleFontSize",
+        "titleFontWeight",
+        "thumbnailIconSize",
+        "thumbnailHalfRows",
+        "switcherMaxWidthAuto",
+        "switcherMaxWidth",
+        "switcherMaxHeight",
     ]
 
     /// True if `key` is an indexed override of one of the 5 overridable appearance prefs
@@ -80,6 +91,9 @@ class PreferencesEvents {
         case "nextWindowGesture": TrackpadEvents.toggle(Preferences.nextWindowGesture != .disabled)
         case "startAtLogin": LoginItem.applyCurrentPreference()
         case "updatePolicy": applyUpdatePolicyPreference()
+        case "appearanceSize":
+            Appearance.resetFineTuneSizing(to: Preferences.appearanceSize)
+            App.resetPreferencesDependentComponents()
         case let k where preferencesRequiringUiReset.contains(k): App.resetPreferencesDependentComponents()
         case let k where isOverrideKey(k) || isPerShortcutGroupingKey(k): App.resetPreferencesDependentComponents()
         default: break
