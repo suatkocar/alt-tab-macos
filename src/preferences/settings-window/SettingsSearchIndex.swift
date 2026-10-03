@@ -73,6 +73,7 @@ enum SettingsSearchIndex {
     static func sheetSearchableStrings(forButtonAction action: Selector) -> [String]? {
         if action == #selector(AppearanceTab.showCustomizeStyleSheet) { return CustomizeStyleSheet.searchableStrings }
         if action == #selector(AppearanceTab.showAnimationsSheet) { return AnimationsSheet.searchableStrings }
+        if action == #selector(AppearanceTab.showFineTuneSheet) { return FineTuneSheet.searchableStrings }
         if action == #selector(ControlsTab.showShortcutsSettings) { return ShortcutsWhenActiveSheet.searchableStrings }
         if action == #selector(ControlsTab.showAdditionalControlsSettings) { return AdditionalControlsSheet.searchableStrings }
         return nil

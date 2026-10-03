@@ -394,6 +394,8 @@ class AppearanceTab: NSObject {
     static var animationsButton: NSButton!
     static var customizeStyleSheet: CustomizeStyleSheet!
     static var animationsSheet: AnimationsSheet!
+    static var fineTuneButton: NSButton!
+    static var fineTuneSheet: FineTuneSheet!
 
     // References used by `refreshProLockUi()` to update Pro-lock affordances while Settings stays open.
     private static weak var styleButtonsStack: NSStackView?
@@ -412,6 +414,7 @@ class AppearanceTab: NSObject {
     static func initTab() -> NSView {
         customizeStyleButton = NSButton(title: getCustomizeStyleButtonTitle(), target: self, action: #selector(showCustomizeStyleSheet))
         animationsButton = NSButton(title: NSLocalizedString("Animations…", comment: ""), target: self, action: #selector(showAnimationsSheet))
+        fineTuneButton = NSButton(title: NSLocalizedString("Fine-tune…", comment: ""), target: self, action: #selector(showFineTuneSheet))
         // Sheets are constructed lazily on first show — see `showCustomizeStyleSheet` /
         // `showAnimationsSheet`. Pre-build search is satisfied by the sheets' static
         // `searchableStrings`, consulted through `SettingsSearchIndex`.
@@ -433,6 +436,8 @@ class AppearanceTab: NSObject {
         animationsButton = nil
         customizeStyleSheet = nil
         animationsSheet = nil
+        fineTuneButton = nil
+        fineTuneSheet = nil
         autoSegmentOverlayRef = nil
         shortcutStyleSegmentOverlayRef = nil
         overrideInfoIcons.removeAll()
@@ -498,7 +503,7 @@ class AppearanceTab: NSObject {
             }), makeOverrideIcon("appearanceThemeOverride")])
         addAfterKeysReleasedRow(table)
         addPreviewSelectedWindowRow(table)
-        table.addRow(rightViews: customizeStyleButton)
+        table.addRow(rightViews: [fineTuneButton, customizeStyleButton])
         refreshAllOverrideInfoLabels()
         return table
     }
@@ -640,6 +645,12 @@ class AppearanceTab: NSObject {
     @objc static func showAnimationsSheet() {
         if animationsSheet == nil { animationsSheet = AnimationsSheet() }
         SettingsWindow.shared.beginSheetWithSearchHighlight(animationsSheet)
+    }
+
+    /// Rebuilt on every open: choosing a Size rewrites the sheet's font, icon and row values.
+    @objc static func showFineTuneSheet() {
+        fineTuneSheet = FineTuneSheet()
+        SettingsWindow.shared.beginSheetWithSearchHighlight(fineTuneSheet)
     }
 
     /// Re-sync the Auto-segment overlay's state (badge + icon/label color). Called on click,

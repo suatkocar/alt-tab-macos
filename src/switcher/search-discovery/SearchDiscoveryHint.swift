@@ -162,8 +162,9 @@ final class SearchDiscoveryHint {
                                            obstruction: preview?.isVisible == true ? preview?.frame : nil)
     }
 
-    /// The switcher's own kind of background, so the hint reads as part of it. Rebuilt when that kind
-    /// changes (e.g. the App Icons style uses clear glass).
+    /// The glass the switcher's style calls for. The switcher itself draws none (see
+    /// `TilesView.cachedEffectView`); the hint keeps it so its own text stays legible. Rebuilt when that
+    /// kind changes (e.g. the App Icons style uses clear glass).
     private func matchSwitcherBackground(_ panel: SearchDiscoveryPanel) -> EffectView {
         let kind = TilesView.currentEffectViewKind ?? requiredEffectViewKind()
         if kind == backgroundKind, let current = panel.background as? EffectView { return current }

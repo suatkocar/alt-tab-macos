@@ -26,6 +26,9 @@ class TilesPanel: NSPanel {
         self.init(contentRect: .zero, styleMask: .nonactivatingPanel, backing: .buffered, defer: false)
         delegate = self
         applyFloatingPanelChrome()
+        isOpaque = false
+        // set explicitly so the transparent gaps between tiles keep mouse and scroll events (see TransparentEffectView)
+        ignoresMouseEvents = false
         TilesView.initialize()
         contentView! = TilesView.contentView
         // 2nd highest level possible; this allows the app to go on top of context menus
@@ -42,7 +45,8 @@ class TilesPanel: NSPanel {
     }
 
     func updateAppearance() {
-        hasShadow = Appearance.enablePanelShadow
+        // a partly transparent background has no clear outline to cast a shadow from; the tiles carry their own
+        hasShadow = Preferences.switcherBackgroundOpacity >= 100 && Appearance.enablePanelShadow
         appearance = NSAppearance(named: Appearance.currentTheme == .dark ? .vibrantDark : .vibrantLight)
     }
 

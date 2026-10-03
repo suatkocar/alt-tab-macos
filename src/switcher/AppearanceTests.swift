@@ -48,6 +48,66 @@ final class AppearanceTests: XCTestCase {
         XCTAssertEqual(hi2, min(0.30, 2.1 / 16), accuracy: 0.001)
     }
 
+    /// The Small/Medium/Large buttons reset the fine-tune sliders to these values, so they must stay the
+    /// values those sizes always had.
+    func testThumbnailsSizingPresetsKeepTheSmallMediumLargeValues() {
+        XCTAssertEqual(AppearanceTestable.thumbnailsSizing(.small), AppearanceTestable.ThumbnailsSizing(halfRows: 10, iconSize: 16, fontSize: 13))
+        XCTAssertEqual(AppearanceTestable.thumbnailsSizing(.medium), AppearanceTestable.ThumbnailsSizing(halfRows: 8, iconSize: 26, fontSize: 14))
+        XCTAssertEqual(AppearanceTestable.thumbnailsSizing(.large), AppearanceTestable.ThumbnailsSizing(halfRows: 6, iconSize: 28, fontSize: 16))
+    }
+
+    /// Vertical screens fit 3 more rows than horizontal ones, like the presets always did (3→6, 4→7, 5→8).
+    func testThumbnailRowsStepByHalfAndAddThreeOnVerticalScreens() {
+        XCTAssertEqual(AppearanceTestable.thumbnailRows(halfRows: 7, isHorizontalScreen: true), 3.5)
+        XCTAssertEqual(AppearanceTestable.thumbnailRows(halfRows: 6, isHorizontalScreen: false), 6)
+        XCTAssertEqual(AppearanceTestable.thumbnailRows(halfRows: 10, isHorizontalScreen: false), 8)
+    }
+
+    func testThumbnailRowsAreClampedToTheSliderRange() {
+        XCTAssertEqual(AppearanceTestable.thumbnailRows(halfRows: 0, isHorizontalScreen: true), 1)
+        XCTAssertEqual(AppearanceTestable.thumbnailRows(halfRows: 40, isHorizontalScreen: true), 8)
+    }
+
+    func testMaxWidthOnScreenFollowsComfortableWidthWhenAuto() {
+        XCTAssertEqual(AppearanceTestable.maxWidthOnScreen(auto: true, percent: 50, physicalWidth: 825),
+                       AppearanceTestable.comfortableWidth(825))
+    }
+
+    func testMaxWidthOnScreenUsesThePercentClampedWhenNotAuto() {
+        XCTAssertEqual(AppearanceTestable.maxWidthOnScreen(auto: false, percent: 95, physicalWidth: 825), 0.95, accuracy: 0.0001)
+        XCTAssertEqual(AppearanceTestable.maxWidthOnScreen(auto: false, percent: 10, physicalWidth: nil), 0.4, accuracy: 0.0001)
+        XCTAssertEqual(AppearanceTestable.maxWidthOnScreen(auto: false, percent: 150, physicalWidth: nil), 1.0, accuracy: 0.0001)
+    }
+
+    func testMaxHeightOnScreenIsThePercentClamped() {
+        XCTAssertEqual(AppearanceTestable.maxHeightOnScreen(percent: 80), 0.8, accuracy: 0.0001)
+        XCTAssertEqual(AppearanceTestable.maxHeightOnScreen(percent: 0), 0.4, accuracy: 0.0001)
+    }
+
+    /// The card wraps the title row (which starts at edgeInsets and spans the tile's inner width) and the
+    /// thumbnail (down to contentBottom), with the padding on every side.
+    func testCardWrapsTheTitleRowAndThumbnailWithThePadding() {
+        let frame = AppearanceTestable.cardFrame(tileWidth: 300, edgeInsets: 12, contentBottom: 245, padding: 6)
+        XCTAssertEqual(frame, CGRect(x: 6, y: 6, width: 288, height: 245))
+        XCTAssertEqual(frame.maxY, 245 + 6)
+    }
+
+    /// The selection ring is drawn 3pt outside the card, under it; the padding stops where that ring would leave
+    /// the tile. Down at 0 the card hugs its content.
+    func testCardPaddingIsClampedSoTheSelectionRingFitsTheTile() {
+        XCTAssertEqual(AppearanceTestable.effectiveCardPadding(20, edgeInsets: 12), 9)
+        XCTAssertEqual(AppearanceTestable.effectiveCardPadding(-1, edgeInsets: 12), 0)
+        XCTAssertEqual(AppearanceTestable.effectiveCardPadding(0.3, edgeInsets: 12), 0.3, accuracy: 0.0001)
+        XCTAssertEqual(AppearanceTestable.cardFrame(tileWidth: 300, edgeInsets: 12, contentBottom: 245, padding: 0),
+                       CGRect(x: 12, y: 12, width: 276, height: 233))
+    }
+
+    /// The thumbnail's corners are concentric with the card's: the card radius minus the padding between them.
+    func testCardInnerRadiusIsConcentric() {
+        XCTAssertEqual(AppearanceTestable.cardInnerRadius(cardRadius: 16, padding: 6), 10)
+        XCTAssertEqual(AppearanceTestable.cardInnerRadius(cardRadius: 4, padding: 6), 0)
+    }
+
     func testThumbnailPlaceholderReservesKnownWindowGeometryWhileCaptureIsAvailable() {
         XCTAssertTrue(ThumbnailPlaceholderLayout.reservesWindowGeometry(
             CGSize(width: 1200, height: 800), screenRecordingGranted: true))
