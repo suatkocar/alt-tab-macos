@@ -347,12 +347,15 @@ class TilesView {
         TilesPanel.shared.contentView = newView
     }
 
+    /// The switcher hosts its content in a `TransparentEffectView` whatever its style; the kind picks the glass that
+    /// view fades in when given a background opacity. The search hint builds its own glass from `currentEffectViewKind`.
     private static func cachedEffectView(for kind: EffectViewKind) -> EffectView {
         if let cached = cachedEffectViews[kind] {
             cached.updateAppearance()
             return cached
         }
-        let view = makeEffectView(for: kind)
+        let view = TransparentEffectView()
+        view.updateAppearance()
         cachedEffectViews[kind] = view
         return view
     }
@@ -726,7 +729,9 @@ class ScrollView: NSScrollView {
         documentView = TilesDocumentView(frame: .zero)
         documentView!.wantsLayer = true
         drawsBackground = false
-        hasVerticalScroller = true
+        // with no panel background a scroller floats on its own over the desktop; wheel, trackpad and keyboard
+        // scrolling don't need it
+        hasVerticalScroller = false
         verticalScrollElasticity = .none
         scrollerStyle = .overlay
         scrollerKnobStyle = .light

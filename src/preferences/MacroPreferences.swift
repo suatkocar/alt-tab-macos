@@ -240,6 +240,31 @@ enum TitleTruncationPreference: CaseIterable, MacroPreference {
     }
 }
 
+enum TitleFontWeightPreference: CaseIterable, MacroPreference {
+    case regular
+    case medium
+    case semibold
+    case bold
+
+    var localizedString: LocalizedString {
+        switch self {
+            case .regular: return NSLocalizedString("Regular", comment: "")
+            case .medium: return NSLocalizedString("Medium", comment: "")
+            case .semibold: return NSLocalizedString("Semibold", comment: "")
+            case .bold: return NSLocalizedString("Bold", comment: "")
+        }
+    }
+
+    var weight: NSFont.Weight {
+        switch self {
+            case .regular: return .regular
+            case .medium: return .medium
+            case .semibold: return .semibold
+            case .bold: return .bold
+        }
+    }
+}
+
 enum GroupAppsPreference: CaseIterable, MacroPreference {
     case mainWindow
     case allWindows
