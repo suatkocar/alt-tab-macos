@@ -20,11 +20,13 @@ enum ShortcutExceptionContextResolver {
     }
 }
 
-/// Matches windows/apps against the user's exception rules. Two independent, pure questions:
+/// Matches windows/apps against the user's exception rules. Three independent, pure questions:
 ///   • `hidesWindow` — should this window be hidden from the switcher? (the exception's `hide` rule)
 ///   • `disablesShortcuts` — should AltTab's global shortcuts be turned off while this app is
 ///     frontmost? (the exception's `ignore` rule)
-/// Both share a **bundle-id prefix gate**: an exception applies iff its `bundleIdentifier` is non-empty
+///   • `separatesTabs` — should this app's native tabs show as separate windows? (the exception's
+///     `groupTabs` rule, else the shortcut's own setting)
+/// All share a **bundle-id prefix gate**: an exception applies iff its `bundleIdentifier` is non-empty
 /// and the app's bundle id has it as a prefix. Operates on canonical `WindowState` / `ApplicationState`
 /// records — no `Window`/`Application` references, so it tests with plain data.
 enum ExceptionMatcher {
@@ -62,5 +64,15 @@ enum ExceptionMatcher {
             !e.bundleIdentifier.isEmpty && id.hasPrefix(e.bundleIdentifier) &&
                 (e.ignore == .always || (e.ignore == .whenFullscreen && isFullscreen))
         }
+    }
+
+    /// An app's native tabs show as separate windows per the first matching exception that sets a `groupTabs`
+    /// rule; without one, per the shortcut's own "Group tabs". nil bundle-id never matches.
+    static func separatesTabs(_ app: ApplicationState, shortcutSeparatesTabs: Bool, exceptions: [ExceptionEntry]) -> Bool {
+        guard let id = app.bundleIdentifier,
+              let rule = exceptions.first(where: { e in
+                  !e.bundleIdentifier.isEmpty && id.hasPrefix(e.bundleIdentifier) && e.groupTabs != .shortcutSetting
+              }) else { return shortcutSeparatesTabs }
+        return rule.groupTabs == .never
     }
 }

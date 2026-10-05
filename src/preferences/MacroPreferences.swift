@@ -458,6 +458,22 @@ enum ExceptionIgnorePreference: String/* required for jsonEncode */, CaseIterabl
     }
 }
 
+/// Overrides the shortcut's "Group tabs" for one app: `.always` shows its native tabs as a single window,
+/// `.never` shows each tab as a window.
+enum ExceptionGroupTabsPreference: String/* required for jsonEncode */, CaseIterable, MacroPreference, Codable {
+    case shortcutSetting = "0"
+    case always = "1"
+    case never = "2"
+
+    var localizedString: LocalizedString {
+        switch self {
+            case .shortcutSetting: return NSLocalizedString("Use shortcut setting", comment: "")
+            case .always: return NSLocalizedString("Always", comment: "")
+            case .never: return NSLocalizedString("Never", comment: "")
+        }
+    }
+}
+
 // MacroPreference are collection of values derived from a single key
 // we don't want to store every value in UserDefaults as the user could change them and contradict the macro
 protocol MacroPreference {
