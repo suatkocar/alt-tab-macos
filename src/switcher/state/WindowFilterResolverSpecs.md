@@ -32,7 +32,9 @@ The predicate, in order:
    make sense for real windows.
 6. For **real windows**: also exclude fullscreen / minimized (when set), windows not in a visible space
    (`.visible`) or in a visible space (`.nonVisible`), windows off the preferred screen
-   (`.showingAltTab`), and non-frontmost native **tabs** (unless tabs are shown as separate windows).
+   (`.showingAltTab`), and non-frontmost native **tabs** (unless tabs are shown as separate windows: the
+   app's exception decides when it sets a "Group tabs" rule, otherwise the shortcut does —
+   `ExceptionMatcher.separatesTabs`).
 7. **Under the cursor** (`appsToShow == .underCursor`): only windows whose frame contains the cursor, passed
    as the lazy `isUnderCursor`. The frame must be
    drawn there, so a minimized window, a hidden app's window, a window on a non-visible Space, and a
@@ -115,6 +117,12 @@ Mirrors `WindowFilterResolverTests.swift` 1:1. Each test flips one knob from an 
 ### I. Tabs (macOS native tabs)
 - **testNonFrontmostTabHiddenWhenGrouping** — a non-frontmost tab is hidden when tabs are grouped.
 - **testTabbedShownWhenSeparateTabs** — shown when "tabs as separate windows" is set.
+- **testTabbedHiddenWhenItsAppGroupsTabsWhileTheShortcutSeparates** — Finder's "Group tabs: Always" hides
+  its non-frontmost tab although the shortcut shows tabs as separate windows.
+- **testTabbedShownWhenItsAppSeparatesTabsWhileTheShortcutGroups** — Zed's "Group tabs: Never" shows its
+  non-frontmost tab although the shortcut groups tabs.
+- **testFrontmostTabStillShownWhenItsAppGroupsTabs** — grouping keeps the group's frontmost tab: that one
+  is the window's single entry.
 
 ### J. Combinations
 - **testAllFiltersOnAndWindowPassesEachShows** — every filter on, a window that satisfies all of them shows.

@@ -291,8 +291,9 @@ final class PreferencesMigrationsTests: XCTestCase {
 // whole prefs/AppKit graph). The declarations below stand in for the symbols those files supply.
 //
 // FAITHFUL stubs (behavior matches production, so the migrations that use them are tested for real):
-//   - ExceptionEntry + ExceptionHide/IgnorePreference: same fields + same String rawValues, so the
-//     JSON produced by `jsonEncode` is byte-identical to production.
+//   - ExceptionEntry + ExceptionHide/Ignore/GroupTabsPreference: same fields + same String rawValues, so the
+//     JSON produced by `jsonEncode` is byte-identical to production. Like production, an entry saved before
+//     `groupTabs` existed decodes to `.shortcutSetting`.
 //   - ShowHowPreference.indexAsString: same case order / index values.
 //   - Preferences.jsonEncode: the real JSONEncoder round-trip.
 
@@ -311,17 +312,35 @@ enum ExceptionIgnorePreference: String, Codable, CaseIterable {
     case whenFullscreen = "2"
 }
 
+enum ExceptionGroupTabsPreference: String, Codable, CaseIterable {
+    case shortcutSetting = "0"
+    case always = "1"
+    case never = "2"
+}
+
 struct ExceptionEntry: Codable, Equatable {
     var bundleIdentifier: String
     var hide: ExceptionHidePreference
     var ignore: ExceptionIgnorePreference
     var windowTitleContains: [String]?
+    var groupTabs: ExceptionGroupTabsPreference
 
-    init(bundleIdentifier: String, hide: ExceptionHidePreference, ignore: ExceptionIgnorePreference, windowTitleContains: [String]? = nil) {
+    init(bundleIdentifier: String, hide: ExceptionHidePreference, ignore: ExceptionIgnorePreference,
+         windowTitleContains: [String]? = nil, groupTabs: ExceptionGroupTabsPreference = .shortcutSetting) {
         self.bundleIdentifier = bundleIdentifier
         self.hide = hide
         self.ignore = ignore
         self.windowTitleContains = windowTitleContains
+        self.groupTabs = groupTabs
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        self.bundleIdentifier = try c.decode(String.self, forKey: .bundleIdentifier)
+        self.hide = try c.decode(ExceptionHidePreference.self, forKey: .hide)
+        self.ignore = try c.decode(ExceptionIgnorePreference.self, forKey: .ignore)
+        self.windowTitleContains = try c.decodeIfPresent([String].self, forKey: .windowTitleContains)
+        self.groupTabs = (try? c.decode(ExceptionGroupTabsPreference.self, forKey: .groupTabs)) ?? .shortcutSetting
     }
 }
 
