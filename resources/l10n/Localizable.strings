@@ -136,6 +136,9 @@
 /* No comment provided by engineer. */
 "Animations" = "Animations";
 
+/* No comment provided by engineer. */
+"App icon size" = "App icon size";
+
 /* Illustration: style.app-icons */
 "App Icons" = "App Icons";
 
@@ -190,6 +193,12 @@
 /* No comment provided by engineer. */
 "Automatic activation failed" = "Automatic activation failed";
 
+/* No comment provided by engineer. */
+"Background opacity" = "Background opacity";
+
+/* No comment provided by engineer. */
+"Bold" = "Bold";
+
 /* Illustration: window.breakfast */
 "Breakfast" = "Breakfast";
 
@@ -209,6 +218,15 @@
 "Capture windows in the background" = "Capture windows in the background";
 
 /* No comment provided by engineer. */
+"Card corner radius" = "Card corner radius";
+
+/* No comment provided by engineer. */
+"Card opacity" = "Card opacity";
+
+/* No comment provided by engineer. */
+"Card padding" = "Card padding";
+
+/* No comment provided by engineer. */
 "Check for updates now…" = "Check for updates now…";
 
 /* No comment provided by engineer. */
@@ -225,6 +243,9 @@
 
 /* No comment provided by engineer. */
 "Choose which windows to switch between" = "Choose which windows to switch between";
+
+/* No comment provided by engineer. */
+"Choosing a Size resets these to that Size. They apply to the Thumbnails style, except with Auto or a shortcut that overrides the Size." = "Choosing a Size resets these to that Size. They apply to the Thumbnails style, except with Auto or a shortcut that overrides the Size.";
 
 /* Permissions window button */
 "Close" = "Close";
@@ -366,6 +387,9 @@
 
 /* No comment provided by engineer. */
 "Find a window by typing" = "Find a window by typing";
+
+/* No comment provided by engineer. */
+"Fine-tune" = "Fine-tune";
 
 /* Illustration: size.fixed */
 "Fixed size" = "Fixed size";
@@ -520,6 +544,12 @@
 
 /* No comment provided by engineer. */
 "Manage activations, view receipts, etc" = "Manage activations, view receipts, etc";
+
+/* No comment provided by engineer. */
+"Max height on screen" = "Max height on screen";
+
+/* No comment provided by engineer. */
+"Max width on screen" = "Max width on screen";
 
 /* No comment provided by engineer. */
 "Maybe later" = "Maybe later";
@@ -678,6 +708,9 @@
 "Red badge with number %@" = "Red badge with number %@";
 
 /* No comment provided by engineer. */
+"Regular" = "Regular";
+
+/* No comment provided by engineer. */
 "Reliable, fast window switching with high-quality thumbnails" = "Reliable, fast window switching with high-quality thumbnails";
 
 /* No comment provided by engineer. */
@@ -694,6 +727,9 @@
 
 /* No comment provided by engineer. */
 "Restart Now" = "Restart Now";
+
+/* No comment provided by engineer. */
+"Rows of thumbnails" = "Rows of thumbnails";
 
 /* Illustration: window.recipes */
 "Safari — Food" = "Safari — Food";
@@ -741,6 +777,9 @@
 "Select windows using vim keys" = "Select windows using vim keys";
 
 /* No comment provided by engineer. */
+"Semibold" = "Semibold";
+
+/* No comment provided by engineer. */
 "Send" = "Send";
 
 /* No comment provided by engineer. */
@@ -751,6 +790,9 @@
 
 /* No comment provided by engineer. */
 "Sending…" = "Sending…";
+
+/* No comment provided by engineer. */
+"Separate tabs" = "Separate tabs";
 
 /* No comment provided by engineer. */
 "Settings imported" = "Settings imported";
@@ -906,6 +948,12 @@
 "Thumbnails and window previews" = "Thumbnails and window previews";
 
 /* No comment provided by engineer. */
+"Title font size" = "Title font size";
+
+/* No comment provided by engineer. */
+"Title font weight" = "Title font weight";
+
+/* No comment provided by engineer. */
 "Title truncation" = "Title truncation";
 
 /* Illustration: style.titles */
@@ -976,6 +1024,9 @@
 
 /* No comment provided by engineer. */
 "Use App Icons" = "Use App Icons";
+
+/* No comment provided by engineer. */
+"Use shortcut setting" = "Use shortcut setting";
 
 /* No comment provided by engineer. */
 "Use Titles" = "Use Titles";
