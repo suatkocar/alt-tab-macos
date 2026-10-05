@@ -140,6 +140,9 @@
 "Animations…" = "Animations…";
 
 /* No comment provided by engineer. */
+"App icon size" = "App icon size";
+
+/* No comment provided by engineer. */
 "App Icons" = "App Icons";
 
 /* No comment provided by engineer. */
@@ -203,6 +206,12 @@
 "Automatic activation failed" = "Automatic activation failed";
 
 /* No comment provided by engineer. */
+"Background opacity" = "Background opacity";
+
+/* No comment provided by engineer. */
+"Bold" = "Bold";
+
+/* No comment provided by engineer. */
 "Brief description of the bug" = "Brief description of the bug";
 
 /* No comment provided by engineer. */
@@ -218,6 +227,15 @@
 "Capture windows in the background" = "Capture windows in the background";
 
 /* No comment provided by engineer. */
+"Card corner radius" = "Card corner radius";
+
+/* No comment provided by engineer. */
+"Card opacity" = "Card opacity";
+
+/* No comment provided by engineer. */
+"Card padding" = "Card padding";
+
+/* No comment provided by engineer. */
 "Check for updates now…" = "Check for updates now…";
 
 /* No comment provided by engineer. */
@@ -231,6 +249,9 @@
 
 /* Onboarding popover; opens Settings on Appearance */
 "Choose a style" = "Choose a style";
+
+/* No comment provided by engineer. */
+"Choosing a Size resets these to that Size. They apply to the Thumbnails style, except with Auto or a shortcut that overrides the Size." = "Choosing a Size resets these to that Size. They apply to the Thumbnails style, except with Auto or a shortcut that overrides the Size.";
 
 /* Permissions window button */
 "Close" = "Close";
@@ -362,6 +383,12 @@
 "Filtering" = "Filtering";
 
 /* No comment provided by engineer. */
+"Fine-tune" = "Fine-tune";
+
+/* No comment provided by engineer. */
+"Fine-tune…" = "Fine-tune…";
+
+/* No comment provided by engineer. */
 "Focus" = "Focus";
 
 /* No comment provided by engineer. */
@@ -475,6 +502,12 @@
 
 /* No comment provided by engineer. */
 "Manage activations, view receipts, etc" = "Manage activations, view receipts, etc";
+
+/* No comment provided by engineer. */
+"Max height on screen" = "Max height on screen";
+
+/* No comment provided by engineer. */
+"Max width on screen" = "Max width on screen";
 
 /* No comment provided by engineer. */
 "Maybe later" = "Maybe later";
@@ -615,6 +648,9 @@
 "Recently Focused First" = "Recently Focused First";
 
 /* No comment provided by engineer. */
+"Regular" = "Regular";
+
+/* No comment provided by engineer. */
 "Reliable, fast window switching with high-quality thumbnails" = "Reliable, fast window switching with high-quality thumbnails";
 
 /* No comment provided by engineer. */
@@ -634,6 +670,9 @@
 
 /* No comment provided by engineer. */
 "Restart Now" = "Restart Now";
+
+/* No comment provided by engineer. */
+"Rows of thumbnails" = "Rows of thumbnails";
 
 /* No comment provided by engineer. */
 "Screen including menu bar" = "Screen including menu bar";
@@ -675,6 +714,9 @@
 "Select windows using vim keys" = "Select windows using vim keys";
 
 /* No comment provided by engineer. */
+"Semibold" = "Semibold";
+
+/* No comment provided by engineer. */
 "Send" = "Send";
 
 /* No comment provided by engineer. */
@@ -688,6 +730,9 @@
 
 /* No comment provided by engineer. */
 "Sending…" = "Sending…";
+
+/* No comment provided by engineer. */
+"Separate tabs" = "Separate tabs";
 
 /* No comment provided by engineer. */
 "Settings imported" = "Settings imported";
@@ -843,6 +888,12 @@
 "Thumbnails and window previews" = "Thumbnails and window previews";
 
 /* No comment provided by engineer. */
+"Title font size" = "Title font size";
+
+/* No comment provided by engineer. */
+"Title font weight" = "Title font weight";
+
+/* No comment provided by engineer. */
 "Title truncation" = "Title truncation";
 
 /* No comment provided by engineer. */
@@ -898,6 +949,9 @@
 
 /* No comment provided by engineer. */
 "Usage" = "Usage";
+
+/* No comment provided by engineer. */
+"Use shortcut setting" = "Use shortcut setting";
 
 /* No comment provided by engineer. */
 "Version" = "Version";
