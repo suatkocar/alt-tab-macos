@@ -24,7 +24,7 @@ enum WindowFilterResolver {
                            onlyVisibleSpaces: Bool = false,      // spacesToShow == .visible
                            onlyNonVisibleSpaces: Bool = false,   // spacesToShow == .nonVisible
                            onlyPreferredScreen: Bool = false,    // screensToShow == .showingAltTab
-                           separateTabs: Bool = false,           // groupTabs == .separateWindows
+                           separateTabs: Bool = false,           // groupTabs == .separateWindows; an app's exception can override it
                            frontmostPid: pid_t? = nil,
                            pidUnderCursor: pid_t? = nil,         // nil: nothing is under the cursor
                            visibleSpaceIds: [UInt64] = [],       // CGSSpaceID === UInt64
@@ -53,7 +53,7 @@ enum WindowFilterResolver {
                 !(onlyVisibleSpaces && !isSpacelessHold(s) && !inAnyVisibleSpace(s, visibleSpaceIds)) &&
                 !(onlyNonVisibleSpaces && (isSpacelessHold(s) || inAnyVisibleSpace(s, visibleSpaceIds))) &&
                 !(onlyPreferredScreen && !isSpacelessHold(s) && !isOnPreferredScreen()) &&
-                (separateTabs || !s.isTabbed) &&
+                (!s.isTabbed || ExceptionMatcher.separatesTabs(app, shortcutSeparatesTabs: separateTabs, exceptions: exceptions)) &&
                 !(onlyUnderCursor && (!canBeUnderCursor(s, app, visibleSpaceIds) || !isUnderCursor())))
     }
 

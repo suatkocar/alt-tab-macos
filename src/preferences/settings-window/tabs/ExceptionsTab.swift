@@ -368,6 +368,11 @@ class ExceptionsTab {
         if entry.ignore != .none {
             parts.append(NSLocalizedString("Ignore shortcuts", comment: ""))
         }
+        if entry.groupTabs == .always {
+            parts.append(NSLocalizedString("Group tabs", comment: ""))
+        } else if entry.groupTabs == .never {
+            parts.append(NSLocalizedString("Separate tabs", comment: ""))
+        }
         return parts.joined(separator: " • ")
     }
 

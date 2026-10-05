@@ -560,12 +560,15 @@ struct ExceptionEntry: Codable {
     var hide: ExceptionHidePreference
     var ignore: ExceptionIgnorePreference
     var windowTitleContains: [String]?
+    var groupTabs: ExceptionGroupTabsPreference
 
-    init(bundleIdentifier: String, hide: ExceptionHidePreference, ignore: ExceptionIgnorePreference, windowTitleContains: [String]? = nil) {
+    init(bundleIdentifier: String, hide: ExceptionHidePreference, ignore: ExceptionIgnorePreference,
+         windowTitleContains: [String]? = nil, groupTabs: ExceptionGroupTabsPreference = .shortcutSetting) {
         self.bundleIdentifier = bundleIdentifier
         self.hide = hide
         self.ignore = ignore
         self.windowTitleContains = windowTitleContains
+        self.groupTabs = groupTabs
     }
 
     // Permissive decoder so we can read both the legacy single-string shape
@@ -584,5 +587,7 @@ struct ExceptionEntry: Codable {
         } else {
             self.windowTitleContains = nil
         }
+        // Entries saved before this rule existed have no key, and must not fail decoding for the same reason.
+        self.groupTabs = (try? c.decode(ExceptionGroupTabsPreference.self, forKey: .groupTabs)) ?? .shortcutSetting
     }
 }

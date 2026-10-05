@@ -14,6 +14,7 @@ class ExceptionEditorView: NSView {
     private let bundleIdField = NSTextField(string: "")
     private let hideDropdown = PopupButtonLikeSystemSettings()
     private let ignoreDropdown = PopupButtonLikeSystemSettings()
+    private let groupTabsDropdown = PopupButtonLikeSystemSettings()
     private var patternsRow: NSView?
     private var patternsListStack = NSStackView()
 
@@ -90,6 +91,7 @@ class ExceptionEditorView: NSView {
         let hideRow = makeHideRow()
         let patternsRow = makePatternsRow()
         let ignoreRow = makeIgnoreRow()
+        let groupTabsRow = makeGroupTabsRow()
         self.patternsRow = patternsRow
 
         addToGroup(rows, view: bundleRow, addSeparator: false)
@@ -98,6 +100,7 @@ class ExceptionEditorView: NSView {
         patternsRow.leadingAnchor.constraint(equalTo: rows.leadingAnchor).isActive = true
         patternsRow.trailingAnchor.constraint(equalTo: rows.trailingAnchor).isActive = true
         addToGroup(rows, view: ignoreRow, addSeparator: true)
+        addToGroup(rows, view: groupTabsRow, addSeparator: true)
 
         // The card is a background sibling (not the rows' container) so the stack drives its size.
         let card = TableGroupView.makeCard()
@@ -174,6 +177,16 @@ class ExceptionEditorView: NSView {
         ignoreDropdown.target = self
         ignoreDropdown.action = #selector(ignoreChanged(_:))
         return makeRow(label: label, control: ignoreDropdown)
+    }
+
+    private func makeGroupTabsRow() -> NSView {
+        let label = makeRowLabel(NSLocalizedString("Group tabs", comment: ""))
+        groupTabsDropdown.translatesAutoresizingMaskIntoConstraints = false
+        groupTabsDropdown.removeAllItems()
+        groupTabsDropdown.addItems(withTitles: ExceptionGroupTabsPreference.allCases.map { $0.localizedString })
+        groupTabsDropdown.target = self
+        groupTabsDropdown.action = #selector(groupTabsChanged(_:))
+        return makeRow(label: label, control: groupTabsDropdown)
     }
 
     private func makePatternsRow() -> NSView {
@@ -279,6 +292,10 @@ class ExceptionEditorView: NSView {
         if ignoreIndex >= 0, ignoreIndex < ignoreDropdown.numberOfItems {
             ignoreDropdown.selectItem(at: ignoreIndex)
         }
+        let groupTabsIndex = entry.groupTabs.index
+        if groupTabsIndex >= 0, groupTabsIndex < groupTabsDropdown.numberOfItems {
+            groupTabsDropdown.selectItem(at: groupTabsIndex)
+        }
         rebuildPatternsList()
         updatePatternsVisibility()
         // Header icon/name only refresh if bundle ID actually changed since last resolution.
@@ -325,6 +342,14 @@ class ExceptionEditorView: NSView {
         let i = sender.indexOfSelectedItem
         if i >= 0 && i < ExceptionIgnorePreference.allCases.count {
             entry.ignore = ExceptionIgnorePreference.allCases[i]
+            emitChange()
+        }
+    }
+
+    @objc private func groupTabsChanged(_ sender: NSPopUpButton) {
+        let i = sender.indexOfSelectedItem
+        if i >= 0 && i < ExceptionGroupTabsPreference.allCases.count {
+            entry.groupTabs = ExceptionGroupTabsPreference.allCases[i]
             emitChange()
         }
     }

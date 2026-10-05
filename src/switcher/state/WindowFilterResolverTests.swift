@@ -202,6 +202,24 @@ final class WindowFilterResolverTests: XCTestCase {
                                                       separateTabs: true, isOnPreferredScreen: true))
     }
 
+    func testTabbedHiddenWhenItsAppGroupsTabsWhileTheShortcutSeparates() {
+        let finder = ExceptionEntry(bundleIdentifier: "com.apple.finder", hide: .none, ignore: .none, groupTabs: .always)
+        XCTAssertFalse(WindowFilterResolver.shouldShow(ws(isTabbed: true), appState(bundleIdentifier: "com.apple.finder"),
+                                                       separateTabs: true, exceptions: [finder], isOnPreferredScreen: true))
+    }
+
+    func testTabbedShownWhenItsAppSeparatesTabsWhileTheShortcutGroups() {
+        let zed = ExceptionEntry(bundleIdentifier: "dev.zed.Zed", hide: .none, ignore: .none, groupTabs: .never)
+        XCTAssertTrue(WindowFilterResolver.shouldShow(ws(isTabbed: true), appState(bundleIdentifier: "dev.zed.Zed"),
+                                                      separateTabs: false, exceptions: [zed], isOnPreferredScreen: true))
+    }
+
+    func testFrontmostTabStillShownWhenItsAppGroupsTabs() {
+        let finder = ExceptionEntry(bundleIdentifier: "com.apple.finder", hide: .none, ignore: .none, groupTabs: .always)
+        XCTAssertTrue(WindowFilterResolver.shouldShow(ws(isTabbed: false), appState(bundleIdentifier: "com.apple.finder"),
+                                                      separateTabs: true, exceptions: [finder], isOnPreferredScreen: true))
+    }
+
     // MARK: - J. Combinations
 
     func testAllFiltersOnAndWindowPassesEachShows() {

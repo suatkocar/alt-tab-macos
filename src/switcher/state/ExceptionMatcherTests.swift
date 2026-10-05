@@ -8,8 +8,9 @@ import XCTest
 final class ExceptionMatcherTests: XCTestCase {
 
     private func entry(_ bundle: String, hide: ExceptionHidePreference = .none,
-                       ignore: ExceptionIgnorePreference = .none, titles: [String]? = nil) -> ExceptionEntry {
-        ExceptionEntry(bundleIdentifier: bundle, hide: hide, ignore: ignore, windowTitleContains: titles)
+                       ignore: ExceptionIgnorePreference = .none, titles: [String]? = nil,
+                       groupTabs: ExceptionGroupTabsPreference = .shortcutSetting) -> ExceptionEntry {
+        ExceptionEntry(bundleIdentifier: bundle, hide: hide, ignore: ignore, windowTitleContains: titles, groupTabs: groupTabs)
     }
 
     private func ws(title: String = "", isWindowlessApp: Bool = false) -> WindowState {
@@ -139,6 +140,47 @@ final class ExceptionMatcherTests: XCTestCase {
     func testDoesNotDisableWhenAppBundleIdNil() {
         XCTAssertFalse(ExceptionMatcher.disablesShortcuts(appState(bundleId: nil), isFullscreen: true,
                                                           exceptions: [entry("com.foo", ignore: .always)]))
+    }
+
+    // MARK: - D. separatesTabs (bundle-id prefix gate + groupTabs rule, else the shortcut's setting)
+
+    func testShortcutSettingDecidesWithoutAnException() {
+        XCTAssertTrue(ExceptionMatcher.separatesTabs(appState(bundleId: "dev.zed.Zed"), shortcutSeparatesTabs: true, exceptions: []))
+        XCTAssertFalse(ExceptionMatcher.separatesTabs(appState(bundleId: "dev.zed.Zed"), shortcutSeparatesTabs: false, exceptions: []))
+    }
+
+    func testGroupTabsAlwaysGroupsWhileTheShortcutSeparates() {
+        XCTAssertFalse(ExceptionMatcher.separatesTabs(appState(bundleId: "com.apple.finder"), shortcutSeparatesTabs: true,
+                                                      exceptions: [entry("com.apple.finder", groupTabs: .always)]))
+    }
+
+    func testGroupTabsNeverSeparatesWhileTheShortcutGroups() {
+        XCTAssertTrue(ExceptionMatcher.separatesTabs(appState(bundleId: "dev.zed.Zed"), shortcutSeparatesTabs: false,
+                                                     exceptions: [entry("dev.zed.Zed", groupTabs: .never)]))
+    }
+
+    func testAnotherAppsTabRuleDoesNotApply() {
+        XCTAssertTrue(ExceptionMatcher.separatesTabs(appState(bundleId: "dev.zed.Zed"), shortcutSeparatesTabs: true,
+                                                     exceptions: [entry("com.apple.finder", groupTabs: .always)]))
+    }
+
+    func testExceptionWithoutATabRuleFollowsTheShortcut() {
+        XCTAssertTrue(ExceptionMatcher.separatesTabs(appState(bundleId: "com.apple.finder"), shortcutSeparatesTabs: true,
+                                                     exceptions: [entry("com.apple.finder", hide: .whenNoOpenWindow)]))
+    }
+
+    func testFirstMatchingExceptionWithATabRuleDecides() {
+        let exceptions = [entry("com.apple", hide: .always), entry("com.apple.finder", groupTabs: .always),
+                          entry("com.apple.finder", groupTabs: .never)]
+        XCTAssertFalse(ExceptionMatcher.separatesTabs(appState(bundleId: "com.apple.finder"), shortcutSeparatesTabs: true,
+                                                      exceptions: exceptions))
+    }
+
+    func testTabRuleNeverMatchesAnEmptyBundleIdOrANilApp() {
+        XCTAssertTrue(ExceptionMatcher.separatesTabs(appState(bundleId: "com.apple.finder"), shortcutSeparatesTabs: true,
+                                                     exceptions: [entry("", groupTabs: .always)]))
+        XCTAssertTrue(ExceptionMatcher.separatesTabs(appState(bundleId: nil), shortcutSeparatesTabs: true,
+                                                     exceptions: [entry("com.apple.finder", groupTabs: .always)]))
     }
 }
 

@@ -4,14 +4,16 @@
 
 ## Summary
 
-The Exceptions tab lets the user add per-app rules. `ExceptionMatcher` answers the two questions those
-rules drive, both pure:
+The Exceptions tab lets the user add per-app rules. `ExceptionMatcher` answers the three questions those
+rules drive, all pure:
 
 - **`hidesWindow`** — should this window be hidden from the switcher? (the exception's `hide` rule)
 - **`disablesShortcuts`** — should AltTab's global shortcuts be turned off while this app is frontmost?
   (the exception's `ignore` rule)
+- **`separatesTabs`** — should this app's native tabs show as separate windows? (the exception's
+  `groupTabs` rule, else the shortcut's own "Group tabs")
 
-Both share a **bundle-id prefix gate**: an exception applies to an app iff the exception's
+All share a **bundle-id prefix gate**: an exception applies to an app iff the exception's
 `bundleIdentifier` is non-empty and the app's bundle id *has it as a prefix* (so `com.foo` covers
 `com.foo.bar`). It was extracted from `Windows.refreshIfWindowShouldBeShownToTheUser` (hide) and
 `App.checkIfShortcutsShouldBeDisabled` (ignore).
@@ -26,6 +28,11 @@ Both share a **bundle-id prefix gate**: an exception applies to an app iff the e
   beats the Exceptions list. The narrower `.windowTitleContains` still fires (it hides only some windows).
 - **Ignore rules**: `.always` disables shortcuts whenever the app is frontmost; `.whenFullscreen` only
   while the active window is fullscreen; `.none` never.
+- **Tab rules**: `.always` shows the app's native tabs as a single window and `.never` shows each tab
+  as a window, whatever the shortcut says; `.shortcutSetting` (the default, and what an entry saved before
+  the rule existed decodes to) leaves it to the shortcut. The first matching exception that sets a tab
+  rule decides, so a broader exception that only hides windows doesn't mask it. This is what lets Finder
+  group its tabs while Zed, using macOS window tabs too, keeps them apart.
 - **Gate guards**: an empty exception `bundleIdentifier` must not match every app; a nil app bundle-id
   never matches; any matching exception in the list is enough.
 - **Fullscreen context**: exact attention uses the named window's state, even when a fullscreen sibling exists.
@@ -64,3 +71,12 @@ Mirrors `ExceptionMatcherTests.swift` 1:1.
 - **testDoesNotDisableWhenIgnoreNone** — `.none` → enabled.
 - **testDoesNotDisableWhenPrefixDiffers** — non-matching prefix → enabled.
 - **testDoesNotDisableWhenAppBundleIdNil** — nil app bundle-id → enabled.
+
+### D. `separatesTabs` (bundle-id prefix gate + groupTabs rule, else the shortcut's setting)
+- **testShortcutSettingDecidesWithoutAnException** — no exception → the shortcut's setting, either way.
+- **testGroupTabsAlwaysGroupsWhileTheShortcutSeparates** — Finder `.always` groups although the shortcut separates.
+- **testGroupTabsNeverSeparatesWhileTheShortcutGroups** — Zed `.never` separates although the shortcut groups.
+- **testAnotherAppsTabRuleDoesNotApply** — Finder's rule leaves Zed on the shortcut's setting.
+- **testExceptionWithoutATabRuleFollowsTheShortcut** — an exception that only hides windows doesn't change tabs.
+- **testFirstMatchingExceptionWithATabRuleDecides** — a broader hide-only exception is skipped; the first tab rule wins.
+- **testTabRuleNeverMatchesAnEmptyBundleIdOrANilApp** — empty exception bundle-id or nil app bundle-id → the shortcut's setting.
